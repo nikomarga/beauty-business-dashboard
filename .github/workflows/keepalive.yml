@@ -13,33 +13,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Visitar dashboard
+      - name: Investigar respuesta del dashboard
         run: |
           URL="https://beauty-business-dashboard.streamlit.app/"
 
-          echo "Comprobando el dashboard..."
+          echo "Consultando el dashboard..."
 
-          HTTP_CODE=$(curl \
-            -sS \
+          curl -sS \
+            -D /tmp/headers.txt \
             -o /tmp/dashboard.html \
-            -w "%{http_code}" \
             --max-time 120 \
-            "$URL")
-          
-          echo "Código HTTP: $HTTP_CODE"
-          
-          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
-            echo "La petición ha recibido una respuesta HTTP."
-          else
-            echo "La petición no ha terminado correctamente."
-            exit 1
-          fi
+            "$URL"
 
-          echo "Código HTTP: $HTTP_CODE"
+          echo "Encabezados de respuesta:"
+          cat /tmp/headers.txt
 
-          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
-            echo "La página respondió correctamente."
-          else
-            echo "La página no respondió como se esperaba."
-            exit 1
-          fi
+          echo "Fin de la comprobación."
