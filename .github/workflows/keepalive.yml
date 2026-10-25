@@ -1,4 +1,4 @@
-```yaml
+
 name: Comprobar Beauty Business Dashboard
 
 on:
@@ -39,4 +39,3 @@ jobs:
 
           echo ""
           echo "Fin del diagnóstico."
-```
