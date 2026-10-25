@@ -60,20 +60,34 @@ jobs:
 
               await page.waitForTimeout(10000);
 
-              console.log('URL final:', page.url());
-              console.log('Título:', await page.title());
-
-              const appVisible = await page.locator(
-                '[data-testid="stAppViewContainer"]'
-              ).count();
               
-              const appContent = await page.locator(
-                '[data-testid="stMain"]'
-              ).count();
-              
-              console.log('Contenedor de la aplicación:', appVisible);
-              console.log('Contenedor principal:', appContent);
-
+            console.log('URL final:', page.url());
+            console.log('Título:', await page.title());
+            
+            await page.screenshot({
+              path: '/tmp/dashboard.png',
+              fullPage: false
+            });
+            
+            console.log(
+              'HTML recibido:',
+              (await page.locator('body').innerHTML()).slice(0, 5000)
+            );
+            
+            console.log(
+              'Texto visible:',
+              (await page.locator('body').innerText().catch(() => '')).slice(0, 2000)
+            );
+            
+            console.log(
+              'Elementos Streamlit:',
+              await page.locator('[data-testid*="stApp"]').count()
+            );
+            
+            console.log(
+              'Iframe:',
+              await page.locator('iframe').count()
+            );
               const texto = await page.locator('body').innerText()
                 .catch(() => '');
 
