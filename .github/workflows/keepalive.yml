@@ -1,124 +1,12 @@
-name: Mantener activo Beauty Business Dashboard
+name: Mantener Streamlit Activo
 
 on:
   schedule:
-    - cron: "17 */6 * * *"
-  workflow_dispatch:
-
-permissions:
-  contents: read
+    - cron: '0 */12 * * *' # Se ejecuta cada 12 horas
 
 jobs:
-  mantener-dashboard:
+  ping:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-
     steps:
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Instalar Playwright
-        run: |
-          npm install --no-save playwright
-          npx playwright install --with-deps chromium
-
-      - name: Abrir Beauty Business Dashboard
-        run: |
-          node <<'NODE'
-          const { chromium } = require('playwright');
-
-          (async () => {
-            const browser = await chromium.launch({
-              headless: true
-            });
-
-            const context = await browser.newContext({
-              viewport: { width: 1365, height: 900 }
-            });
-
-            const page = await context.newPage();
-
-            page.setDefaultNavigationTimeout(60000);
-
-            page.on('requestfailed', request => {
-              console.log(
-                'Petición fallida:',
-                request.url(),
-                request.failure()?.errorText
-              );
-            });
-
-            try {
-              console.log('Abriendo el dashboard...');
-
-              await page.goto(
-                'https://beauty-business-dashboard.streamlit.app/',
-                { waitUntil: 'domcontentloaded', timeout: 60000 }
-              );
-
-              await page.waitForTimeout(10000);
-
-              
-            console.log('URL final:', page.url());
-            console.log('Título:', await page.title());
-            
-            await page.screenshot({
-              path: '/tmp/dashboard.png',
-              fullPage: false
-            });
-            
-            console.log(
-              'HTML recibido:',
-              (await page.locator('body').innerHTML()).slice(0, 5000)
-            );
-            
-            console.log(
-              'Texto visible:',
-              (await page.locator('body').innerText().catch(() => '')).slice(0, 2000)
-            );
-            
-            console.log(
-              'Elementos Streamlit:',
-              await page.locator('[data-testid*="stApp"]').count()
-            );
-            
-            console.log(
-              'Iframe:',
-              await page.locator('iframe').count()
-            );
-              const texto = await page.locator('body').innerText()
-                .catch(() => '');
-
-              console.log(
-                'Contenido de la página:',
-                texto.slice(0, 1500)
-              );
-
-              if (
-                page.url().includes('/-/auth/') ||
-                texto.toLowerCase().includes('sign in')
-              ) {
-                console.log(
-                  'AVISO: El navegador ha llegado a una página de autenticación.'
-                );
-              } else {
-                console.log(
-                  'La página se ha abierto sin una redirección evidente a autenticación.'
-                );
-              }
-
-            } catch (error) {
-              console.error(
-                'No se pudo completar la navegación:',
-                error.message
-              );
-              console.log('Última URL:', page.url());
-              process.exitCode = 1;
-
-            } finally {
-              await browser.close();
-            }
-          })();
-          NODE
+    - name: Enviar petición HTTP
+      run: curl -I https://beauty-business-dashboard.streamlit.app/
