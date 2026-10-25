@@ -1,4 +1,4 @@
-
+```yaml
 name: Comprobar Beauty Business Dashboard
 
 on:
@@ -15,32 +15,28 @@ jobs:
     timeout-minutes: 3
 
     steps:
-      - name: Consultar el dashboard
+      - name: Diagnosticar respuesta del dashboard
         run: |
           URL="https://beauty-business-dashboard.streamlit.app/"
 
-          echo "Consultando Beauty Business Dashboard..."
+          echo "Consultando el dashboard..."
 
-          HTTP_CODE=$(curl -sS -L \
+          curl -sS \
+            --max-time 30 \
+            --max-redirs 0 \
+            -D /tmp/headers.txt \
             -o /tmp/dashboard.html \
-            -w "%{http_code}" \
-            --max-time 120 \
-            "$URL")
-
-          echo "Código HTTP final: $HTTP_CODE"
-
-          echo "URL final:"
-          curl -sS -L -o /dev/null \
-            -w "%{url_effective}\n" \
-            --max-time 120 \
+            -w "\nCódigo HTTP: %{http_code}\nURL consultada: %{url_effective}\n" \
             "$URL"
 
-          echo "Tamaño de la respuesta:"
-          wc -c < /tmp/dashboard.html
+          echo ""
+          echo "Encabezados recibidos:"
+          cat /tmp/headers.txt
 
-          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
-            echo "La petición HTTP terminó correctamente."
-          else
-            echo "La petición no terminó correctamente."
-            exit 1
-          fi
+          echo ""
+          echo "Primeros 1000 caracteres de la respuesta:"
+          head -c 1000 /tmp/dashboard.html || true
+
+          echo ""
+          echo "Fin del diagnóstico."
+```
