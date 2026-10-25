@@ -20,12 +20,20 @@ jobs:
           echo "Comprobando el dashboard..."
 
           HTTP_CODE=$(curl \
-            -L \
             -sS \
             -o /tmp/dashboard.html \
             -w "%{http_code}" \
             --max-time 120 \
             "$URL")
+          
+          echo "Código HTTP: $HTTP_CODE"
+          
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
+            echo "La petición ha recibido una respuesta HTTP."
+          else
+            echo "La petición no ha terminado correctamente."
+            exit 1
+          fi
 
           echo "Código HTTP: $HTTP_CODE"
 
