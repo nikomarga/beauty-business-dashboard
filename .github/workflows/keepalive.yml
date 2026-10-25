@@ -1,3 +1,4 @@
+
 name: Comprobar Beauty Business Dashboard
 
 on:
@@ -11,21 +12,35 @@ permissions:
 jobs:
   comprobar-dashboard:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
 
     steps:
-      - name: Investigar respuesta del dashboard
+      - name: Consultar el dashboard
         run: |
           URL="https://beauty-business-dashboard.streamlit.app/"
 
-          echo "Consultando el dashboard..."
+          echo "Consultando Beauty Business Dashboard..."
 
-          curl -sS \
-            -D /tmp/headers.txt \
+          HTTP_CODE=$(curl -sS -L \
             -o /tmp/dashboard.html \
+            -w "%{http_code}" \
+            --max-time 120 \
+            "$URL")
+
+          echo "Código HTTP final: $HTTP_CODE"
+
+          echo "URL final:"
+          curl -sS -L -o /dev/null \
+            -w "%{url_effective}\n" \
             --max-time 120 \
             "$URL"
 
-          echo "Encabezados de respuesta:"
-          cat /tmp/headers.txt
+          echo "Tamaño de la respuesta:"
+          wc -c < /tmp/dashboard.html
 
-          echo "Fin de la comprobación."
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
+            echo "La petición HTTP terminó correctamente."
+          else
+            echo "La petición no terminó correctamente."
+            exit 1
+          fi
