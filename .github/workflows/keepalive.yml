@@ -15,27 +15,25 @@ jobs:
     timeout-minutes: 3
 
     steps:
-      - name: Diagnosticar respuesta del dashboard
+      - name: Comprobar acceso al dashboard
         run: |
           URL="https://beauty-business-dashboard.streamlit.app/"
 
-          echo "Consultando el dashboard..."
+          echo "Consultando dashboard como navegador..."
 
           curl -sS \
             --max-time 30 \
             --max-redirs 0 \
+            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/142.0.0.0 Safari/537.36" \
             -D /tmp/headers.txt \
             -o /tmp/dashboard.html \
-            -w "\nCódigo HTTP: %{http_code}\nURL consultada: %{url_effective}\n" \
+            -w "\nCódigo HTTP: %{http_code}\n" \
             "$URL"
 
           echo ""
-          echo "Encabezados recibidos:"
+          echo "Encabezados:"
           cat /tmp/headers.txt
 
           echo ""
-          echo "Primeros 1000 caracteres de la respuesta:"
-          head -c 1000 /tmp/dashboard.html || true
-
-          echo ""
-          echo "Fin del diagnóstico."
+          echo "Contenido recibido:"
+          head -c 500 /tmp/dashboard.html
