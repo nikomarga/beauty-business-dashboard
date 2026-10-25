@@ -63,6 +63,17 @@ jobs:
               console.log('URL final:', page.url());
               console.log('Título:', await page.title());
 
+              const appVisible = await page.locator(
+                '[data-testid="stAppViewContainer"]'
+              ).count();
+              
+              const appContent = await page.locator(
+                '[data-testid="stMain"]'
+              ).count();
+              
+              console.log('Contenedor de la aplicación:', appVisible);
+              console.log('Contenedor principal:', appContent);
+
               const texto = await page.locator('body').innerText()
                 .catch(() => '');
 
